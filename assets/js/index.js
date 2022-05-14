@@ -1,51 +1,42 @@
-$(function() {
-  $('#reg').on('click', () => {
-    $('.sign').hide()
-    $('.login').show()
-  })
-  $('#login').on('click', () => {
-    $('.sign').show()
-    $('.login').hide()
-  })
-  
-  // 表单校验规则
-  let form = layui.form
-  let layer = layui.layer
-  form.verify({
-    pwd: [/^[\S]{6,12}$/, '密码必须6到12位，且不能出现空格'], 
-    repwd: function(value) {
-    const password = $('.login [name=password]').val()
-    if(password !== value) {
-      return '两次密码不一致'
-    }
-    }
-  })
-})
-// 注册
-$('#loginform').on('submit', function(e) {
-  e.preventDefault()
-  let data = {username: $('#loginform [name="username"]').val(), password: $('#loginform [name="password"]').val()}
-  $.post('/api/reguser', data, (res) => {
-    if(res.status !== 0) {
-      return layer.msg(res.message); 
-    }
-    layer.msg(res.message); 
-    $('#login').click()
-  })
-})
-// 登录
-$('#formsign').submit(function(e) {
-  e.preventDefault()
+$('.layui-footer').css('text-align', 'center')
+getuserinfo()
+
+function getuserinfo() {
   $.ajax({
-    url: '/api/login',
-    method:'POST',
-    data: $(this).serialize(),
-    success: function(res) {
-      if(res.status !== 0) return layer.msg(res.message); 
-      layer.msg(res.message); 
-      console.log(res);
-      location.href = '/index.html'
-      localStorage.setItem('token', res.token)
-    }
+    method: 'GET',
+    url: '/my/userinfo',    
+    success: function(res) {   
+      if (res.status !== 0) {
+        return 
+      }
+      render(res.data)
+    }    
   })
+}
+
+// 头像渲染
+function render(data) {
+  if (!data.user_pic) {
+    $('.userinfo img').hide()
+    $('.avatar').show()
+
+  } else {
+    $('.userinfo img').show()
+    $('.avatar').hide()
+  }
+  const username = data.nickname || data.username
+  $('.avatar').text(username[0].toUpperCase())
+  $('.welcome').text('欢迎' + username)
+
+}
+
+// 退出
+$('#out').click(() => {
+  let layer = layui.layer
+  layer.confirm('确认退出?', {icon: 3, title:'提示'}, function(index){
+    location.href = '/login.html'
+    localStorage.removeItem('token')
+    
+    layer.close(index);
+  });
 })
