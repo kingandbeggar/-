@@ -16,13 +16,13 @@ function getuserinfo() {
 
 // 头像渲染
 function render(data) {
-  if (!data.user_pic) {
-    $('.userinfo img').hide()
-    $('.avatar').show()
+  if (data.user_pic) {
+    $('.userinfo img').attr('src', data.user_pic).show()
+    $('.avatar').hide()
 
   } else {
-    $('.userinfo img').show()
-    $('.avatar').hide()
+    $('.userinfo img').hide()
+    $('.avatar').show()
   }
   const username = data.nickname || data.username
   $('.avatar').text(username[0].toUpperCase())
